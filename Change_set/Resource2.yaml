@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+ EngineVersion :
+   Type: String
+   Description:  The database Version
+   Default: 8.0.28
+ AllocatedStorage:
+   Type: String
+   Description: Allocation storage
+   Default: ''
+Resources:
+StrapiDBSubnetGroup:
+  Type: "AWS::RDS::DBSubnetGroup"
+  Properties:
+    DBSubnetGroupDescription: "Subnet Group for Strapi database"
+    DBSubnetGroupName: !Sub "DEMO"
+    SubnetIds:
+      - subnet-xxxxxx                
+      - subnet-xxxxxx                                            
+    Tags:
+      - Key: Name
+        Value: 'DB2'       
+StrapiMasterDB:
+  Type: AWS::RDS::DBInstance
+  Properties:
+    DBInstanceIdentifier: 'DB2'
+    DBName: 'DB2'
+    AllocatedStorage: !Ref AllocatedStorage
+    DBInstanceClass: 'db.m6g.xlarge'
+    Engine: "MYSQL"
+    MasterUsername: 'admin'
+    MasterUserPassword: 'xxxxx'
+    MultiAZ: true
+    EngineVersion: !Ref EngineVersion
+    AutoMinorVersionUpgrade: false
+    Iops: 1000
+    PubliclyAccessible: false
+    StorageType: 'io1'
+    Port: '3306'
+    StorageEncrypted: true
+    CopyTagsToSnapshot: true
+    EnableIAMDatabaseAuthentication: false
+    EnablePerformanceInsights: true
+    PerformanceInsightsRetentionPeriod: 7
+    DeletionProtection: false
+    DBSubnetGroupName: !Ref StrapiDBSubnetGroup
+    VPCSecurityGroups:
+      - sg-xxxxxx
+    EnableCloudwatchLogsExports: ["audit", "error","general","slowquery"]
+    BackupRetentionPeriod: 7
+    Tags:
+      - Key: Name
+        Value:'StrapiMasterDB'
+

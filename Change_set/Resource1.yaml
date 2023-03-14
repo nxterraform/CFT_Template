@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+ EngineVersion :
+   Type: String
+   Description:  The database Version
+   Default: 8.0.28
+ AllocatedStorage:
+   Type: String
+   Description: Allocation storage
+   Default: ''
+Resources:
+RDSDBSubnetGroup:
+  Type: "AWS::RDS::DBSubnetGroup"
+  Properties:
+    DBSubnetGroupDescription: "Subnet Group for RDS MySQL database"
+    DBSubnetGroupName: !Sub "RDS-db-subnet-group"
+    SubnetIds:
+      - subnet- xxxxx              
+      - subnet- xxxxx                     
+    Tags:
+      - Key: Name
+        Value: RDSDBSubnetGroup     
+MasterDB:
+  Type: AWS::RDS::DBInstance
+  Properties:
+    DBInstanceIdentifier: 'DB1'
+    DBName: 'DB1'
+    AllocatedStorage: !Ref AllocatedStorage
+    DBInstanceClass: 'db.m6g.xlarge'
+    Engine: "MYSQL"
+    MasterUsername: 'admin'
+    MasterUserPassword: 'xxxxx'
+    MultiAZ: true
+    EngineVersion: !Ref EngineVersion
+    AutoMinorVersionUpgrade: false
+    Iops: 1000
+    PubliclyAccessible: false
+    StorageType: 'io1'
+    Port: '3306'
+    StorageEncrypted: true
+    CopyTagsToSnapshot: true
+    EnableIAMDatabaseAuthentication: false
+    EnablePerformanceInsights: true
+    PerformanceInsightsRetentionPeriod: 7
+    DeletionProtection: false
+    DBSubnetGroupName: !Ref 'RDSDBSubnetGroup'
+    VPCSecurityGroups:
+      - sg-xxxxxxx
+    EnableCloudwatchLogsExports: ["audit", "error","general","slowquery"]
+    BackupRetentionPeriod: 7
+    Tags:
+      - Key: Name
+        Value:  'DB13' 
+
