@@ -1,54 +1,69 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Parameters:
- EngineVersion :
-   Type: String
-   Description:  The database Version
-   Default: 8.0.28
- AllocatedStorage:
-   Type: String
-   Description: Allocation storage
-   Default: ''
+  EngineVersion :
+    Type: String
+    Description:  The database Version
+    Default: 8.0.28
+  AllocatedStorage:
+    Type: String
+    Description: Allocation storage
+    Default: ''
+  DBPassword:
+    NoEcho: 'true'
+    Description: The database admin account password
+    Type: String
+    MinLength: '1'
+    MaxLength: '41'
+    AllowedPattern: '[a-zA-Z0-9]+'
+    ConstraintDescription: must contain only alphanumeric characters.
+  DBMaster:
+    Type: String
+    NoEcho: true
 Resources:
-StrapiDBSubnetGroup:
-  Type: "AWS::RDS::DBSubnetGroup"
-  Properties:
-    DBSubnetGroupDescription: "Subnet Group for Strapi database"
-    DBSubnetGroupName: !Sub "DEMO"
-    SubnetIds:
-      - subnet-xxxxxx                
-      - subnet-xxxxxx                                            
-    Tags:
-      - Key: Name
-        Value: 'DB2'       
-StrapiMasterDB:
-  Type: AWS::RDS::DBInstance
-  Properties:
-    DBInstanceIdentifier: 'DB2'
-    DBName: 'DB2'
-    AllocatedStorage: !Ref AllocatedStorage
-    DBInstanceClass: 'db.m6g.xlarge'
-    Engine: "MYSQL"
-    MasterUsername: 'admin'
-    MasterUserPassword: 'xxxxx'
-    MultiAZ: true
-    EngineVersion: !Ref EngineVersion
-    AutoMinorVersionUpgrade: false
-    Iops: 1000
-    PubliclyAccessible: false
-    StorageType: 'io1'
-    Port: '3306'
-    StorageEncrypted: true
-    CopyTagsToSnapshot: true
-    EnableIAMDatabaseAuthentication: false
-    EnablePerformanceInsights: true
-    PerformanceInsightsRetentionPeriod: 7
-    DeletionProtection: false
-    DBSubnetGroupName: !Ref StrapiDBSubnetGroup
-    VPCSecurityGroups:
-      - sg-xxxxxx
-    EnableCloudwatchLogsExports: ["audit", "error","general","slowquery"]
-    BackupRetentionPeriod: 7
-    Tags:
-      - Key: Name
-        Value:'StrapiMasterDB'
+  StrapiDBSubnetGroup:
+    Type: "AWS::RDS::DBSubnetGroup"
+    Properties:
+      DBSubnetGroupDescription: "Subnet Group for Strapi database"
+      DBSubnetGroupName: "Blogsubnet"
+      SubnetIds:
+        - subnet-          #Add Subnet here                                                 
+      Tags:
+        - Key: Name
+          Value: 'DB2'       
+  RDSDBInstance:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      AllocatedStorage: !Ref AllocatedStorage
+      DBInstanceClass: db.t3.micro
+      Engine: mysql
+      EngineVersion: 8.0.28
+      MasterUsername: !Ref DBMaster
+      MasterUserPassword: !Ref DBPassword
+      VPCSecurityGroups:
+        - sg-                                  #Add SecurityGroups here
+      BackupRetentionPeriod: 7
+      DBSubnetGroupName: !Ref StrapiDBSubnetGroup
+      MultiAZ: false
+      StorageEncrypted: true
+      DeletionProtection: true
+      PubliclyAccessible: false
+  
+  RDSDBInstance1:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      AllocatedStorage: !Ref AllocatedStorage
+      DBInstanceClass: db.t3.micro
+      Engine: mysql
+      EngineVersion: 8.0.28
+      MasterUsername: !Ref DBMaster
+      MasterUserPassword: !Ref DBPassword
+      VPCSecurityGroups:
+        - sg-                                  #Add SecurityGroups here
+      BackupRetentionPeriod: 7
+      DBSubnetGroupName: !Ref StrapiDBSubnetGroup
+      MultiAZ: false
+      StorageEncrypted: true
+      DeletionProtection: true
+      PubliclyAccessible: false
+ 
 
